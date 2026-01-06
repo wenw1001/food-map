@@ -3,499 +3,239 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>今天吃什麼？ | 美食探險</title>
+    <title>🍱 全能美食導航員</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
-    
     <style>
         :root {
-            /* 繽紛漸層配色 */
-            --gradient-bg: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 99%, #FECFEF 100%);
-            --gradient-btn: linear-gradient(45deg, #FA8BFF 0%, #2BD2FF 52%, #2BFF88 90%);
-            --card-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            --main-font: 'Noto Sans TC', sans-serif;
-            --accent-color: #FF6B6B;
+            --primary: #FF4757;
+            --secondary: #2F3542;
+            --bg: #F1F2F6;
         }
 
-        body {
-            font-family: var(--main-font);
-            background-color: #f0f2f5;
-            margin: 0;
-            padding: 0;
-            color: #333;
-        }
-
-        /* 頂部彩色區塊 */
-        header {
-            background: var(--gradient-bg);
-            padding: 60px 20px 40px;
-            text-align: center;
-            border-radius: 0 0 30px 30px;
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.2);
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 2.5rem;
-            color: #fff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-            letter-spacing: 2px;
-        }
-
-        header p {
-            color: rgba(255,255,255,0.9);
-            font-size: 1.1rem;
-            margin-top: 10px;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: -30px auto 0; /* 讓內容往上浮動 */
-            padding: 20px;
-            position: relative;
-        }
-
-        /* 篩選區塊卡片化 */
-        .filter-card {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 25px;
-        }
-
-        .section-title {
-            font-size: 1rem;
-            color: #888;
-            margin-bottom: 15px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* 膠囊按鈕選單 */
-        .options-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .options-grid input[type="radio"] {
-            display: none;
-        }
-
-        .options-grid label {
-            padding: 10px 20px;
-            border-radius: 50px;
-            background: #f0f2f5;
-            color: #666;
-            cursor: pointer;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-            font-weight: bold;
-        }
-
-        /* 選中狀態：繽紛邊框 */
-        .options-grid input[type="radio"]:checked + label {
-            background: #fff;
-            color: #FF6B6B;
-            border-color: #FF6B6B;
-            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.2);
-        }
-
-        /* 巨大的 Discover 按鈕 */
-        .action-btn {
-            display: block;
-            width: 100%;
-            padding: 18px;
-            border: none;
-            border-radius: 50px;
-            background: var(--gradient-btn);
-            background-size: 200% auto;
-            color: white;
-            font-size: 1.3rem;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 10px 20px rgba(43, 210, 255, 0.3);
-            transition: 0.5s;
-            margin-top: 20px;
-        }
-
-        .action-btn:hover {
-            background-position: right center; /* 動畫效果 */
-            transform: translateY(-3px);
-        }
-
-        /* 載入中 */
-        .loading {
-            text-align: center;
-            color: #888;
-            display: none;
-            padding: 20px;
-            font-weight: bold;
-        }
-
-        /* 結果列表 */
-        #results {
-            margin-top: 30px;
-        }
-
-        .place-card {
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.08);
-            margin-bottom: 20px;
-            display: flex;
-            animation: popIn 0.5s ease forwards;
-            opacity: 0;
-            transform: scale(0.9);
-            border: 1px solid #eee;
-        }
-
-        .place-map {
-            width: 120px;
-            flex-shrink: 0;
-            background: #eee;
-        }
+        body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--secondary); }
+        header { background: var(--primary); color: white; padding: 40px 20px; text-align: center; border-radius: 0 0 30px 30px; }
+        .container { max-width: 650px; margin: -30px auto 50px; padding: 0 15px; }
+        .card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-bottom: 20px; }
         
-        .place-map img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .section-title { font-size: 1rem; font-weight: bold; margin: 15px 0 10px; color: #57606f; display: block; }
+        
+        /* 繽紛的食物標籤 */
+        .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+        .chip-group input { display: none; }
+        .chip-group label {
+            padding: 8px 16px; border-radius: 50px; background: #f0f0f0; 
+            cursor: pointer; font-size: 0.9rem; transition: 0.3s; border: 1.5px solid transparent;
         }
+        .chip-group input:checked + label { background: #ffeae6; color: var(--primary); border-color: var(--primary); font-weight: bold; }
 
-        .place-info {
-            padding: 15px;
-            flex-grow: 1;
+        .action-btn {
+            width: 100%; padding: 18px; border: none; border-radius: 15px;
+            background: var(--primary); color: white; font-size: 1.2rem; font-weight: bold;
+            cursor: pointer; margin-top: 25px; transition: 0.3s;
         }
+        .action-btn:hover { background: #ff6b81; transform: translateY(-2px); }
 
-        .place-tags {
-            font-size: 0.75rem;
-            color: #2BD2FF;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 5px;
+        /* 店家結果卡片 */
+        .place-item { background: white; border-radius: 20px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .place-content { display: flex; padding: 15px; gap: 15px; }
+        .place-map-box { width: 140px; height: 140px; flex-shrink: 0; border-radius: 15px; overflow: hidden; }
+        .place-map-box img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .place-details { flex-grow: 1; }
+        .place-name { font-size: 1.2rem; font-weight: bold; margin: 0; }
+        .route-summary { font-size: 0.85rem; background: #f8f9fa; padding: 8px; border-radius: 10px; margin: 10px 0; color: #2f3542; }
+        
+        /* 路線明細 */
+        .directions-box { 
+            padding: 0 15px 15px; border-top: 1px solid #eee; 
+            font-size: 0.85rem; color: #57606f; display: none; 
         }
+        .step-item { margin: 8px 0; padding-left: 20px; position: relative; }
+        .step-item::before { content: "•"; position: absolute; left: 0; color: var(--primary); font-weight: bold; }
+        
+        .toggle-route { color: var(--primary); cursor: pointer; font-size: 0.85rem; font-weight: bold; text-decoration: underline; }
 
-        .place-name {
-            font-size: 1.2rem;
-            margin: 0 0 5px 0;
-            color: #333;
-        }
-
-        .rating {
-            color: #FFB300;
-            font-weight: bold;
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-            display: inline-block;
-        }
-
-        .meta-info {
-            font-size: 0.85rem;
-            color: #666;
-            background: #f8f9fa;
-            padding: 8px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-
-        .go-btn {
-            display: inline-block;
-            text-decoration: none;
-            background: #333;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: bold;
-        }
-
-        @keyframes popIn {
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        /* 手機版調整 */
-        @media (max-width: 600px) {
-            header h1 { font-size: 2rem; }
-            .place-card { flex-direction: column; }
-            .place-map { width: 100%; height: 120px; }
-        }
+        .loading { text-align: center; padding: 20px; display: none; font-weight: bold; color: var(--primary); }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>✨ 今天吃什麼？</h1>
-    <p>不想思考的時候，交給我們來選！</p>
+    <h1>🍕 美食與導航特派員</h1>
+    <p>選好想吃的與交通方式，我帶你去！</p>
 </header>
 
 <div class="container">
-    
-    <div class="filter-card">
-        <div class="section-title">💰 你的預算</div>
-        <div class="options-grid">
-            <input type="radio" name="price" id="p0" value="" checked>
-            <label for="p0">都可以</label>
-
-            <input type="radio" name="price" id="p1" value="1">
-            <label for="p1">💸 便宜就好</label>
-
-            <input type="radio" name="price" id="p2" value="2">
-            <label for="p2">💵 質感小店</label>
-
-            <input type="radio" name="price" id="p3" value="3">
-            <label for="p3">💎 發薪日大餐</label>
+    <div class="card">
+        <span class="section-title">🍜 我想吃... (可多選)</span>
+        <div class="chip-group">
+            <input type="checkbox" id="f1" name="food" value="火鍋" checked><label for="f1">火鍋</label>
+            <input type="checkbox" id="f2" name="food" value="燒肉"><label for="f2">燒肉</label>
+            <input type="checkbox" id="f3" name="food" value="拉麵"><label for="f3">拉麵</label>
+            <input type="checkbox" id="f4" name="food" value="義大利麵"><label for="f4">義式</label>
+            <input type="checkbox" id="f5" name="food" value="壽司 日式"><label for="f5">日料</label>
+            <input type="checkbox" id="f6" name="food" value="漢堡 美式"><label for="f6">美式</label>
+            <input type="checkbox" id="f7" name="food" value="早午餐"><label for="f7">早午餐</label>
+            <input type="checkbox" id="f8" name="food" value="居酒屋"><label for="f8">居酒屋</label>
+            <input type="checkbox" id="f9" name="food" value="咖啡廳 甜點"><label for="f9">甜點咖啡</label>
+            <input type="checkbox" id="f10" name="food" value="韓式料理"><label for="f10">韓式</label>
+            <input type="checkbox" id="f11" name="food" value="泰式料理"><label for="f11">泰式</label>
+            <input type="checkbox" id="f12" name="food" value="牛排"><label for="f12">牛排</label>
+            <input type="checkbox" id="f13" name="food" value="素食"><label for="f13">蔬食素食</label>
+            <input type="checkbox" id="f14" name="food" value="酒吧"><label for="f14">酒吧</label>
+            <input type="checkbox" id="f15" name="food" value="滷味 宵夜"><label for="f15">宵夜點心</label>
+            <input type="checkbox" id="f16" name="food" value="餐酒館"><label for="f16">餐酒館</label>
         </div>
 
-        <hr style="border: 0; border-top: 1px dashed #eee; margin: 20px 0;">
-
-        <div class="section-title">🚗 交通方式</div>
-        <div class="options-grid">
-            <input type="radio" name="radius" id="r1" value="500">
-            <label for="r1">🚶 走路 (500m)</label>
-
-            <input type="radio" name="radius" id="r2" value="1500" checked>
-            <label for="r2">🛵 騎車 (1.5km)</label>
-
-            <input type="radio" name="radius" id="r3" value="5000">
-            <label for="r3">🚕 搭車 (5km)</label>
+        <span class="section-title">🚇 交通方式與範圍</span>
+        <div class="chip-group">
+            <input type="radio" id="m1" name="mode" value="WALKING" checked><label for="m1">🚶 走路 (1km內)</label>
+            <input type="radio" id="m2" name="mode" value="BICYCLING"><label for="m2">🚲 騎車 (5km內)</label>
+            <input type="radio" id="m3" name="mode" value="TRANSIT"><label for="m3">🚌 轉乘大眾運輸 (15km)</label>
         </div>
 
-        <hr style="border: 0; border-top: 1px dashed #eee; margin: 20px 0;">
-
-        <div class="section-title">🍽️ 想吃哪一餐</div>
-        <div class="options-grid">
-            <input type="radio" name="type" id="t_lunch" value="lunch" checked>
-            <label for="t_lunch">午餐</label>
-
-            <input type="radio" name="type" id="t_dinner" value="dinner">
-            <label for="t_dinner">晚餐</label>
-
-            <input type="radio" name="type" id="t_cafe" value="cafe">
-            <label for="t_cafe">咖啡甜點</label>
-            
-             <input type="radio" name="type" id="t_mid" value="midnight">
-            <label for="t_mid">宵夜</label>
-        </div>
-
-        <button class="action-btn" onclick="startDiscovery()">🚀 幫我決定！</button>
+        <button class="action-btn" onclick="searchFood()">🚀 尋找並規劃路線</button>
     </div>
 
-    <div id="loading" class="loading">
-        🔍 正在雷達掃描附近的美食...<br>(請記得按「允許」定位喔！)
-    </div>
-
+    <div id="loading" class="loading">📡 正在連接衛星並規劃路線...</div>
     <div id="results"></div>
+    <button id="more-btn" style="display:none; width:100%; padding:15px; border:none; background:none; color:var(--primary); font-weight:bold; cursor:pointer;" onclick="displayBatch()">⬇ 顯示更多隨機推薦</button>
 </div>
 
 <script>
     (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
-        key: "AIzaSyAX02p-zEZMVHrIm3Lq-4WhC2EKr5pEki8", 
-        v: "weekly",
+        key: "YOUR_API_KEY", // ⚠️ 替換為你的 API Key
+        v: "weekly"
     });
 </script>
 
 <script>
-    let userPos = null;
-    let placeLib = null;
-    let geometryLib = null;
-    const apiKey = "AIzaSyAX02p-zEZMVHrIm3Lq-4WhC2EKr5pEki8"; 
+    let userPos, placeLib, directionsService;
+    let pool = [];
+    let currentIndex = 0;
+    const apiKey = "YOUR_API_KEY"; // ⚠️ 替換為你的 API Key
 
-    // 初始化
-    window.onload = function() {
-        console.log("💡 系統初始化...");
-        
-        // 根據時間預選
-        const hour = new Date().getHours();
-        if(hour >= 21 || hour < 5) document.getElementById('t_mid').checked = true;
-        else if(hour >= 17) document.getElementById('t_dinner').checked = true;
-        else if(hour >= 14) document.getElementById('t_cafe').checked = true;
-    };
-
-    async function startDiscovery() {
-        console.log("🚀 開始探索...");
+    async function searchFood() {
         const loading = document.getElementById('loading');
-        const resultsDiv = document.getElementById('results');
+        const results = document.getElementById('results');
+        const moreBtn = document.getElementById('more-btn');
         
-        // 1. 防呆檢查
-        if (apiKey.includes("YOUR_API_KEY") || apiKey.length < 10) {
-            alert("⚠️ 請更換程式碼中的 YOUR_API_KEY！");
-            return;
-        }
-
-        resultsDiv.innerHTML = '';
         loading.style.display = 'block';
-        loading.innerHTML = "📡 Step 1: 正在載入新版地圖元件...";
+        results.innerHTML = '';
+        moreBtn.style.display = 'none';
+        pool = [];
+        currentIndex = 0;
 
-        try {
-            // 2. 載入新版 Libraries (這是新版 API 的關鍵寫法)
-            if (!placeLib) {
-                placeLib = await google.maps.importLibrary("places");
-                geometryLib = await google.maps.importLibrary("geometry");
-                console.log("✅ Google Places Library (New) 載入成功");
-            }
+        if (!placeLib) placeLib = await google.maps.importLibrary("places");
+        if (!directionsService) directionsService = new google.maps.DirectionsService();
 
-            loading.innerHTML = "🛰️ Step 2: 正在定位你的位置...";
-
-            // 3. 瀏覽器定位
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    userPos = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    };
-                    console.log("✅ 定位成功", userPos);
-                    searchNewPlaces(userPos);
-                },
-                (error) => {
-                    console.error("定位失敗", error);
-                    loading.style.display = 'none';
-                    alert("❌ 無法取得定位，請確認瀏覽器權限。");
-                }
-            );
-
-        } catch (e) {
-            console.error("API 載入失敗", e);
-            loading.style.display = 'none';
-            alert("❌ Google Maps API 載入失敗，請檢查 Console 錯誤訊息 (可能是 Key 沒開通權限)");
-        }
-    }
-
-    async function searchNewPlaces(location) {
-        const loading = document.getElementById('loading');
-        loading.innerHTML = "🔍 Step 3: AI 正在搜尋並分析附近店家...";
-        
-        const priceLevel = document.querySelector('input[name="price"]:checked').value;
-        const radius = parseInt(document.querySelector('input[name="radius"]:checked').value);
-        const type = document.querySelector('input[name="type"]:checked').value;
-
-        // 關鍵字邏輯
-        let textQuery = "美食";
-        if(type === 'cafe') textQuery = "咖啡廳 甜點";
-        else if(type === 'midnight') textQuery = "宵夜";
-        else if(type === 'lunch') textQuery = "午餐";
-        else if(type === 'dinner') textQuery = "晚餐";
-
-        console.log(`搜尋條件: ${textQuery}, 半徑: ${radius}m`);
-
-        // --- 新版 API 搜尋邏輯 (Text Search) ---
-        // 使用 Place.searchByText 取代舊的 nearbySearch
-        const { Place } = placeLib;
-
-        const request = {
-            textQuery: textQuery,
-            fields: ['displayName', 'location', 'rating', 'userRatingCount', 'businessStatus', 'photos', 'id', 'types'],
-            locationBias: {
-                center: location,
-                radius: radius
-            },
-            maxResultCount: 8, // 新版 API 限制
-            isOpenNow: true,   // 只找營業中
-            language: 'zh-TW'
-        };
-
-        try {
-            const { places } = await Place.searchByText(request);
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            userPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
             
-            if (!places || places.length === 0) {
+            const foods = Array.from(document.querySelectorAll('input[name="food"]:checked')).map(el => el.value);
+            const mode = document.querySelector('input[name="mode"]:checked').value;
+            
+            let radius = 1000;
+            if (mode === "BICYCLING") radius = 5000;
+            if (mode === "TRANSIT") radius = 15000;
+
+            const { Place } = placeLib;
+            const request = {
+                textQuery: foods.join(" "),
+                locationBias: { center: userPos, radius: radius },
+                isOpenNow: true,
+                fields: ['displayName', 'location', 'rating', 'id']
+            };
+
+            try {
+                const { places } = await Place.searchByText(request);
+                if (!places || places.length === 0) throw "無結果";
+                
+                // 隨機打亂
+                pool = places.sort(() => Math.random() - 0.5);
+                displayBatch();
+            } catch (e) {
+                alert("附近找不到這些類型的營業中餐廳喔！");
                 loading.style.display = 'none';
-                alert("🥺 附近找不到符合條件的店...");
-                return;
             }
-
-            console.log(`✅ 找到 ${places.length} 間店`, places);
-
-            // 簡單排序 (熱門度)
-            // 新版 API 的 rating 欄位直接取用
-            places.sort((a, b) => {
-                const scoreA = (a.rating || 0) * (a.userRatingCount || 0);
-                const scoreB = (b.rating || 0) * (b.userRatingCount || 0);
-                return scoreB - scoreA;
-            });
-
-            // 取前 5 名
-            const topPlaces = places.slice(0, 5);
-            
-            // 計算距離 (Distance Matrix 依然沿用舊版 Service，因為還沒強制廢除)
-            calculateDistances(topPlaces);
-
-        } catch (err) {
-            console.error("搜尋發生錯誤", err);
-            loading.style.display = 'none';
-            alert("搜尋時發生錯誤：" + err.message);
-        }
-    }
-
-    function calculateDistances(places) {
-        const loading = document.getElementById('loading');
-        loading.innerHTML = "🚗 Step 4: 正在計算交通時間...";
-
-        const serviceMatrix = new google.maps.DistanceMatrixService();
-        const destinations = places.map(p => p.location); // 新版 API 的 location 是 LatLng 物件
-
-        serviceMatrix.getDistanceMatrix({
-            origins: [userPos],
-            destinations: destinations,
-            travelMode: 'DRIVING',
-        }, (response, status) => {
-            loading.style.display = 'none';
-            if (status === 'OK') {
-                const elements = response.rows[0].elements;
-                places.forEach((place, index) => {
-                    place.travelInfo = elements[index];
-                });
-            }
-            renderCards(places);
         });
     }
 
-    function renderCards(places) {
+    async function displayBatch() {
+        const loading = document.getElementById('loading');
+        const moreBtn = document.getElementById('more-btn');
+        const mode = document.querySelector('input[name="mode"]:checked').value;
+        const batch = pool.slice(currentIndex, currentIndex + 3); // 每次顯示3筆，因為導航 API 較重
+
+        for (const place of batch) {
+            await getRouteData(place, mode);
+        }
+
+        currentIndex += 3;
+        loading.style.display = 'none';
+        if (currentIndex < pool.length) moreBtn.style.display = 'block';
+    }
+
+    async function getRouteData(place, mode) {
+        return new Promise((resolve) => {
+            directionsService.route({
+                origin: userPos,
+                destination: place.location,
+                travelMode: google.maps.TravelMode[mode]
+            }, (result, status) => {
+                if (status === 'OK') {
+                    renderCard(place, result.routes[0].legs[0]);
+                }
+                resolve();
+            });
+        });
+    }
+
+    function renderCard(place, leg) {
         const container = document.getElementById('results');
+        const cardId = `route-${place.id}`;
         
-        places.forEach((place, i) => {
-            // 新版 API 的資料結構取值方式稍微不同
-            const lat = place.location.lat();
-            const lng = place.location.lng();
-            const name = place.displayName; // 新版是 displayName
-            const rating = place.rating || "New";
-            const ratingCount = place.userRatingCount || 0;
-            
-            // 處理圖片
-            let photoUrl = 'https://via.placeholder.com/300?text=No+Image';
-            if (place.photos && place.photos.length > 0) {
-                // 新版 API 取得圖片 URL 的方法
-                photoUrl = place.photos[0].getURI({maxWidth: 400});
-            }
+        // 製作地圖路徑 URL
+        const path = `path=color:0xff4757ff|weight:5|${userPos.lat},${userPos.lng}|${place.location.lat()},${place.location.lng()}`;
+        const mapUrl = `https://maps.googleapis.com/maps/api/staticmap?size=300x300&markers=color:blue|label:S|${userPos.lat},${userPos.lng}&markers=color:red|label:E|${place.location.lat()},${place.location.lng()}&${path}&key=${apiKey}`;
 
-            const mapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=15&size=300x300&maptype=roadmap&markers=color:blue|label:Me|${userPos.lat},${userPos.lng}&markers=color:red|${lat},${lng}&key=${apiKey}`;
+        // 整理路線步驟
+        const stepsHtml = leg.steps.map(step => `<div class="step-item">${step.instructions} (${step.distance.text})</div>`).join('');
 
-            let distText = "📍 計算中...";
-            if (place.travelInfo && place.travelInfo.distance) {
-                distText = `📍 距離 ${place.travelInfo.distance.text} • 🚗 約 ${place.travelInfo.duration.text}`;
-            }
-
-            const navLink = `https://www.google.com/maps/dir/?api=1&origin=${userPos.lat},${userPos.lng}&destination=${lat},${lng}&destination_place_id=${place.id}&travelmode=driving`;
-
-            const html = `
-                <div class="place-card" style="animation-delay: ${i * 0.1}s">
-                    <div class="place-map">
-                        <img src="${mapUrl}" alt="地圖預覽" onerror="this.src='https://via.placeholder.com/300?text=No+Map'">
+        const html = `
+            <div class="place-item">
+                <div class="place-content">
+                    <div class="place-map-box">
+                        <img src="${mapUrl}">
                     </div>
-                    <div class="place-info">
-                        <div class="place-tags">RECOMMEND</div>
-                        <h3 class="place-name">${name}</h3>
-                        <div class="rating">★ ${rating} <span style="color:#aaa;font-weight:normal">(${ratingCount})</span></div>
-                        <div class="meta-info">${distText}</div>
-                        <a href="${navLink}" target="_blank" class="go-btn">前往導航 ➔</a>
+                    <div class="place-details">
+                        <h3 class="place-name">${place.displayName}</h3>
+                        <div style="color:#ff9f43; font-weight:bold;">★ ${place.rating || '新開幕'}</div>
+                        <div class="route-summary">
+                            ⏱️ 預計：<b>${leg.duration.text}</b> (${leg.distance.text})<br>
+                            👣 方式：${getModeIcon()}
+                        </div>
+                        <div class="toggle-route" onclick="document.getElementById('${cardId}').style.display='block'; this.style.display='none'">查看詳細走法 ▼</div>
                     </div>
                 </div>
-            `;
-            container.innerHTML += html;
-        });
+                <div id="${cardId}" class="directions-box">
+                    <p><b>具體路線引導：</b></p>
+                    ${stepsHtml}
+                    <a href="https://www.google.com/maps/dir/?api=1&origin=${userPos.lat},${userPos.lng}&destination_place_id=${place.id}&travelmode=${document.querySelector('input[name="mode"]:checked').value.toLowerCase()}" 
+                       target="_blank" style="display:block; margin-top:10px; color:var(--primary); font-weight:bold; text-decoration:none;">開啟 Google Maps 導航 ➔</a>
+                </div>
+            </div>
+        `;
+        container.innerHTML += html;
+    }
+
+    function getModeIcon() {
+        const mode = document.querySelector('input[name="mode"]:checked').value;
+        if (mode === 'WALKING') return "走路";
+        if (mode === 'BICYCLING') return "騎乘";
+        return "大眾運輸";
     }
 </script>
+
 </body>
 </html>
