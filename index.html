@@ -3,244 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🍱 隨機美食特派員 | 懶人模式版</title>
+    <title>Gourmet Finder | 極簡版</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #FF4757;
-            --secondary: #2F3542;
-            --accent: #ffa502;
-            --bg: #F8F9FA;
-        }
-
-        body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--secondary); }
-        header { background: var(--primary); color: white; padding: 40px 20px; text-align: center; border-radius: 0 0 30px 30px; }
-        .container { max-width: 650px; margin: -30px auto 50px; padding: 0 15px; }
-        .card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        :root { --p: #FF4757; --bg: #F8F9FA; }
+        body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+        .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h1 { color: var(--p); text-align: center; margin-top: 0; }
+        .section-title { font-weight: bold; margin: 15px 0 10px; display: block; color: #555; }
         
-        .section-title { font-size: 1rem; font-weight: bold; margin: 20px 0 10px; color: #57606f; display: block; border-left: 4px solid var(--primary); padding-left: 10px; }
-        
+        /* 選項樣式 */
         .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
         .chip-group input { display: none; }
-        .chip-group label {
-            padding: 8px 16px; border-radius: 50px; background: #eee; 
-            cursor: pointer; font-size: 0.85rem; transition: 0.3s; border: 1.5px solid transparent;
-        }
-        .chip-group input:checked + label { background: #ffeae6; color: var(--primary); border-color: var(--primary); font-weight: bold; }
+        .chip-group label { padding: 8px 15px; border-radius: 50px; background: #eee; cursor: pointer; font-size: 0.9rem; }
+        .chip-group input:checked + label { background: var(--p); color: white; font-weight: bold; }
 
-        .action-btn {
-            width: 100%; padding: 18px; border: none; border-radius: 15px;
-            background: var(--primary); color: white; font-size: 1.3rem; font-weight: bold;
-            cursor: pointer; margin-top: 25px; transition: 0.3s;
-        }
-        .action-btn:hover { background: #ff6b81; transform: translateY(-2px); }
-
-        .place-item { background: white; border-radius: 20px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
-        .place-content { display: flex; padding: 15px; gap: 15px; }
-        .place-map-box { width: 120px; height: 120px; flex-shrink: 0; border-radius: 12px; overflow: hidden; }
-        .place-map-box img { width: 100%; height: 100%; object-fit: cover; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; background: var(--p); color: white; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px; }
         
-        .place-details { flex-grow: 1; }
-        .place-name { font-size: 1.15rem; font-weight: bold; margin: 0; }
-        .route-summary { font-size: 0.8rem; background: #fffaf0; padding: 6px 10px; border-radius: 8px; margin: 8px 0; border: 1px solid #ffeaa7; }
+        /* 店家樣式 */
+        .item { background: white; border-radius: 15px; overflow: hidden; margin-bottom: 15px; display: flex; box-shadow: 0 3px 10px rgba(0,0,0,0.05); }
+        .m-box { width: 100px; height: 100px; flex-shrink: 0; }
+        .m-box img { width: 100%; height: 100%; object-fit: cover; }
+        .info { padding: 12px; flex-grow: 1; }
+        .name { font-size: 1rem; font-weight: bold; margin: 0; }
         
-        .directions-box { padding: 15px; border-top: 1px dashed #ddd; font-size: 0.85rem; color: #57606f; display: none; background: #fafafa; }
-        .step-item { margin: 8px 0; padding-left: 15px; position: relative; }
-        .step-item::before { content: "•"; position: absolute; left: 0; color: var(--primary); }
-
-        .loading { text-align: center; padding: 20px; display: none; font-weight: bold; color: var(--primary); }
+        /* 除錯視窗 */
+        #debug { background: #333; color: #0f0; font-family: monospace; padding: 10px; border-radius: 10px; font-size: 11px; height: 150px; overflow-y: auto; margin-top: 20px; display: none; }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>🍲 點餐救星</h1>
-    <p>不想選？就讓衛星決定今天的驚喜！</p>
-</header>
-
-<div class="container">
-    <div class="card">
-        <span class="section-title">🥘 我想吃... (不勾選代表「隨便」)</span>
-        <div class="chip-group">
-            <input type="checkbox" id="f1" name="food" value="火鍋"><label for="f1">火鍋</label>
-            <input type="checkbox" id="f2" name="food" value="鹹水雞"><label for="f2">鹹水雞</label>
-            <input type="checkbox" id="f3" name="food" value="滷味"><label for="f3">滷味</label>
-            <input type="checkbox" id="f4" name="food" value="炭烤 炸雞"><label for="f4">炸雞炭烤</label>
-            <input type="checkbox" id="f5" name="food" value="拉麵 烏龍麵"><label for="f5">拉麵</label>
-            <input type="checkbox" id="f6" name="food" value="壽司 日式料理"><label for="f6">日料</label>
-            <input type="checkbox" id="f7" name="food" value="義大利麵 披薩"><label for="f7">義式</label>
-            <input type="checkbox" id="f8" name="food" value="美式 漢堡"><label for="f8">漢堡</label>
-            <input type="checkbox" id="f9" name="food" value="手搖飲 甜點"><label for="f9">飲料甜點</label>
-            <input type="checkbox" id="f10" name="food" value="便當 炒飯 麵食"><label for="f10">台式日常</label>
-        </div>
-
-        <span class="section-title">💰 預算</span>
-        <div class="chip-group">
-            <input type="radio" id="p1" name="budget" value="1"><label for="p1">200內</label>
-            <input type="radio" id="p2" name="budget" value="2" checked><label for="p2">平價</label>
-            <input type="radio" id="p3" name="budget" value="3"><label for="p3">稍貴</label>
-            <input type="radio" id="p_any" name="budget" value="all"><label for="p_any">不限預算</label>
-        </div>
-
-        <span class="section-title">🚇 交通</span>
-        <div class="chip-group">
-            <input type="radio" id="m1" name="mode" value="WALKING"><label for="m1">🚶 走路</label>
-            <input type="radio" id="m2" name="mode" value="BICYCLING" checked><label for="m2">🚲 騎車</label>
-            <input type="radio" id="m3" name="mode" value="TRANSIT"><label for="m3">🚌 轉乘</label>
-        </div>
-
-        <button class="action-btn" onclick="searchFood()">🚀 隨機選一家！</button>
+<div class="card">
+    <h1>🍽️ 隨機找美食</h1>
+    
+    <span class="section-title">時段</span>
+    <div class="chip-group">
+        <input type="radio" id="s1" name="t" value="餐廳" checked><label for="s1">一般時段</label>
+        <input type="radio" id="s2" name="t" value="早餐店"><label for="s2">早餐</label>
+        <input type="radio" id="s3" name="t" value="宵夜 小吃"><label for="s3">宵夜</label>
     </div>
 
-    <div id="loading" class="loading">📡 正在搜尋...</div>
-    <div id="results"></div>
-    <button id="more-btn" style="display:none; width:100%; padding:15px; border:none; background:none; color:var(--primary); font-weight:bold; cursor:pointer;" onclick="displayBatch()">⬇ 再給我幾家選</button>
+    <span class="section-title">價位</span>
+    <div class="chip-group">
+        <input type="radio" id="p1" name="b" value="1"><label for="p1">200內</label>
+        <input type="radio" id="p2" name="b" value="2" checked><label for="p2">中價位</label>
+        <input type="radio" id="p3" name="b" value="all"><label for="p3">不限</label>
+    </div>
+
+    <span class="section-title">距離</span>
+    <div class="chip-group">
+        <input type="radio" id="m1" name="r" value="1000" checked><label for="m1">走路 (1km)</label>
+        <input type="radio" id="m2" name="r" value="5000"><label for="m2">大範圍 (5km)</label>
+    </div>
+
+    <button class="btn" onclick="run()">幫我推薦 5 家！</button>
 </div>
+
+<div id="debug"></div>
+<div id="res"></div>
 
 <script>
     (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
-        key: "AIzaSyAX02p-zEZMVHrIm3Lq-4WhC2EKr5pEki8", // ⚠️
+        key: "AIzaSyAX02p-zEZMVHrIm3Lq-4WhC2EKr5pEki8", 
         v: "weekly"
     });
 </script>
 
 <script>
-    let userPos, placeLib, directionsService;
-    let pool = [];
-    let currentIndex = 0;
-    const apiKey = "<strong>YOUR_API_KEY</strong>"; // ⚠️
+    const apiKey = "AIzaSyAX02p-zEZMVHrIm3Lq-4WhC2EKr5pEki8"; 
+    let logBox = document.getElementById('debug');
 
-    async function searchFood() {
-        const loading = document.getElementById('loading');
-        const results = document.getElementById('results');
-        const moreBtn = document.getElementById('more-btn');
+    function log(msg) {
+        logBox.style.display = 'block';
+        logBox.innerHTML += `> ${msg}<br>`;
+        logBox.scrollTop = logBox.scrollHeight;
+        console.log(msg);
+    }
+
+    async function run() {
+        log("1. 開始執行...");
+        const resDiv = document.getElementById('res');
+        resDiv.innerHTML = '';
         
-        loading.style.display = 'block';
-        results.innerHTML = '';
-        pool = [];
-        currentIndex = 0;
-        moreBtn.style.display = 'none';
+        try {
+            const lib = await google.maps.importLibrary("places");
+            log("2. API 庫載入成功");
 
-        if (!placeLib) placeLib = await google.maps.importLibrary("places");
-        if (!directionsService) directionsService = new google.maps.DirectionsService();
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const myLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                log(`3. 定位成功: ${myLoc.lat}, ${myLoc.lng}`);
 
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-            userPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-            
-            const foods = Array.from(document.querySelectorAll('input[name="food"]:checked')).map(el => el.value);
-            const budgetVal = document.querySelector('input[name="budget"]:checked').value;
-            const mode = document.querySelector('input[name="mode"]:checked').value;
-            
-            // 邏輯 1: 如果沒選食物，query 設為最廣泛的「美食」
-            const textQuery = foods.length > 0 ? foods.join(" ") : "美食 餐廳 小吃";
-            
-            let radius = (mode === "WALKING") ? 1000 : (mode === "BICYCLING" ? 4000 : 12000);
+                const q = document.querySelector('input[name="t"]:checked').value;
+                const r = parseInt(document.querySelector('input[name="r"]:checked').value);
+                const b = document.querySelector('input[name="b"]:checked').value;
 
-            const { Place } = placeLib;
-            
-            let request = {
-                textQuery: textQuery,
-                locationBias: { center: userPos, radius: radius },
-                isOpenNow: true,
-                fields: ['displayName', 'location', 'rating', 'id', 'userRatingCount'],
-                language: 'zh-TW'
-            };
+                const request = {
+                    textQuery: q,
+                    locationBias: { center: myLoc, radius: r },
+                    isOpenNow: true,
+                    fields: ['displayName', 'location', 'rating'],
+                    maxResultCount: 10
+                };
+                if(b !== 'all') request.priceLevels = [parseInt(b)];
 
-            // 邏輯 2: 只有在選擇特定預算時才加上篩選，避免「不限預算」報錯
-            if(budgetVal !== "all") {
-                request.priceLevels = [parseInt(budgetVal)];
-            }
-
-            try {
-                const { places } = await Place.searchByText(request);
+                log(`4. 正在發送搜尋請求... (Query: ${q})`);
+                const { places } = await lib.Place.searchByText(request);
                 
                 if (!places || places.length === 0) {
-                    // 邏輯 3: 自動容錯 - 如果沒結果且原本有預算限制，放寬預算再搜一次
-                    if (budgetVal !== "all") {
-                        console.log("放寬條件重新搜尋...");
-                        delete request.priceLevels;
-                        const retry = await Place.searchByText(request);
-                        if (!retry.places || retry.places.length === 0) throw "無結果";
-                        pool = retry.places;
-                    } else {
-                        throw "無結果";
-                    }
-                } else {
-                    pool = places;
+                    log("⚠️ 搜尋回傳 0 筆結果。可能是價位太嚴苛或區域太偏僻。");
+                    return;
                 }
-                
-                pool = pool.sort(() => Math.random() - 0.5);
-                displayBatch();
-            } catch (e) {
-                loading.style.display = 'none';
-                alert("🥺 附近似乎沒有正在營業的店，試著切換「交通方式」擴大範圍，或勾選不同類別看看！");
-            }
-        });
-    }
 
-    async function displayBatch() {
-        const loading = document.getElementById('loading');
-        const moreBtn = document.getElementById('more-btn');
-        const mode = document.querySelector('input[name="mode"]:checked').value;
-        const batch = pool.slice(currentIndex, currentIndex + 3);
+                log(`5. 找到 ${places.length} 筆，隨機挑選 5 筆中...`);
+                const shuffled = places.sort(() => 0.5 - Math.random()).slice(0, 5);
 
-        for (const place of batch) {
-            await getRouteData(place, mode);
-        }
+                shuffled.forEach(p => {
+                    const lat = p.location.lat();
+                    const lng = p.location.lng();
+                    const mapUrl = `https://maps.googleapis.com/maps/api/staticmap?size=200x200&markers=color:blue|${myLoc.lat},${myLoc.lng}&markers=color:red|${lat},${lng}&key=${apiKey}`;
+                    
+                    resDiv.innerHTML += `
+                        <div class="item">
+                            <div class="m-box"><img src="${mapUrl}"></div>
+                            <div class="info">
+                                <p class="name">${p.displayName}</p>
+                                <p style="font-size:0.8rem; color:#f90;">★ ${p.rating || 'N/A'}</p>
+                                <a href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}" target="_blank" style="font-size:0.8rem; color:blue;">導航去 ➔</a>
+                            </div>
+                        </div>
+                    `;
+                });
+                log("6. 渲染完成！");
 
-        currentIndex += 3;
-        loading.style.display = 'none';
-        if (currentIndex < pool.length) moreBtn.style.display = 'block';
-    }
-
-    async function getRouteData(place, mode) {
-        return new Promise((resolve) => {
-            directionsService.route({
-                origin: userPos,
-                destination: place.location,
-                travelMode: google.maps.TravelMode[mode]
-            }, (result, status) => {
-                if (status === 'OK') renderCard(place, result.routes[0].legs[0]);
-                resolve();
+            }, (err) => {
+                log(`❌ 定位失敗: ${err.message}`);
             });
-        });
-    }
-
-    function renderCard(place, leg) {
-        const container = document.getElementById('results');
-        const cardId = `route-${place.id}`;
-        
-        const path = `path=color:0xff4757ff|weight:5|${userPos.lat},${userPos.lng}|${place.location.lat()},${place.location.lng()}`;
-        const mapUrl = `https://maps.googleapis.com/maps/api/staticmap?size=260x260&markers=color:blue|label:S|${userPos.lat},${userPos.lng}&markers=color:red|label:E|${place.location.lat()},${place.location.lng()}&${path}&key=${apiKey}`;
-
-        const stepsHtml = leg.steps.map(step => `<div class="step-item">${step.instructions} (${step.distance.text})</div>`).join('');
-
-        const html = `
-            <div class="place-item">
-                <div class="place-content">
-                    <div class="place-map-box"><img src="${mapUrl}"></div>
-                    <div class="place-details">
-                        <h3 class="place-name">${place.displayName}</h3>
-                        <div style="color:var(--accent); font-weight:bold; font-size:0.9rem;">★ ${place.rating || 'New'} (${place.userRatingCount || 0})</div>
-                        <div class="route-summary"><b>${leg.duration.text}</b> (${leg.distance.text})</div>
-                        <div class="toggle-route" onclick="toggleRoute('${cardId}', this)">詳細路線 ▼</div>
-                    </div>
-                </div>
-                <div id="${cardId}" class="directions-box">
-                    ${stepsHtml}
-                    <a href="https://www.google.com/maps/dir/?api=1&origin=${userPos.lat},${userPos.lng}&destination=${encodeURIComponent(place.displayName)}&destination_place_id=${place.id}&travelmode=${document.querySelector('input[name="mode"]:checked').value.toLowerCase()}" 
-                       target="_blank" style="display:block; margin-top:10px; color:var(--primary); font-weight:bold; text-align:center;">開啟地圖導航 ➔</a>
-                </div>
-            </div>
-        `;
-        container.innerHTML += html;
-    }
-
-    function toggleRoute(id, btn) {
-        const box = document.getElementById(id);
-        const isOpen = box.style.display === 'block';
-        box.style.display = isOpen ? 'none' : 'block';
-        btn.innerText = isOpen ? '詳細路線 ▼' : '收合路線 ▲';
+        } catch (e) {
+            log(`❌ 系統錯誤: ${e.message}`);
+        }
     }
 </script>
 
